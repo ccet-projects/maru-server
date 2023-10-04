@@ -1,0 +1,45 @@
+{
+  "name": "@maru/server",
+  "version": "1.0.0",
+  "description": "Web server for Maru framework",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:ccet-projects/maru-server.git"
+  },
+  "homepage": "https://github.com/ccet-projects/maru-server#readme",
+  "author": "Anna Agte <matiasrustagte@gmail.com>",
+  "license": "UNLICENSED",
+  "type": "module",
+  "exports": "./index.js",
+  "scripts": {
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@fastify/cors": "^8.3.0",
+    "@fastify/static": "^6.11.2",
+    "@fastify/swagger": "^8.10.0",
+    "@fastify/swagger-ui": "^1.9.3",
+    "ajv-keywords": "^5.1.0",
+    "fastify": "^4.23.2",
+    "fastify-plugin": "^4.5.1",
+    "socket.io": "^4.7.2",
+    "socket.io-parser": "^4.2.4"
+  },
+  "peerDependencies": {
+    "maru": "github:ccet-projects/maru#v1.0.4"
+  },
+  "devDependencies": {
+    "eslint": "x",
+    "eslint-config-maru": "github:ccet-projects/eslint-config-maru",
+    "eslint-plugin-import": "x"
+  },
+  "eslintConfig": {
+    "root": true,
+    "extends": [
+      "maru"
+    ]
+  }
+}
