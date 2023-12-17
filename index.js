@@ -16,9 +16,7 @@ import APIErrorSchema from './lib/schemas/APIError.js';
 import ObjectIdSchema from './lib/schemas/ObjectId.js';
 import HttpStatus from './lib/HttpStatus.js';
 
-export default class WebServer {
-  name = 'server';
-
+export default class Server {
   app;
 
   config;
