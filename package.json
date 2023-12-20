@@ -10,7 +10,10 @@
   "author": "Anna Agte <matiasrustagte@gmail.com>",
   "license": "UNLICENSED",
   "type": "module",
-  "exports": "./index.js",
+  "exports": {
+    ".": "./index.js",
+    "./errors.js": "./lib/errors.js"
+  },
   "scripts": {
     "test": "node --test"
   },
@@ -19,6 +22,7 @@
   },
   "dependencies": {
     "@fastify/cors": "^8.3.0",
+    "@fastify/jwt": "^7.2.4",
     "@fastify/static": "^6.11.2",
     "@fastify/swagger": "^8.10.0",
     "@fastify/swagger-ui": "^1.9.3",
@@ -29,7 +33,7 @@
     "socket.io-parser": "^4.2.4"
   },
   "peerDependencies": {
-    "maru": "github:ccet-projects/maru#v1.1.0"
+    "maru": "github:ccet-projects/maru"
   },
   "devDependencies": {
     "eslint": "x",

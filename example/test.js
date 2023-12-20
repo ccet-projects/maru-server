@@ -34,4 +34,12 @@ describe('REST API', () => {
     assert.ok(book.title);
     assert.ok(book.author);
   });
+
+  it('Иные HTTP-статусы', async () => {
+    const url = `${app.config.baseUrl}/secretSection`;
+    const response = await fetch(url);
+    assert.equal(response.status, 403);
+    const error = await response.json();
+    assert.ok(error.code);
+  });
 });

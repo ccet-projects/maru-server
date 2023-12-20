@@ -6,12 +6,12 @@ import fastify from 'fastify';
 import cors from '@fastify/cors';
 import swagger from '@fastify/swagger';
 import swaggerUI from '@fastify/swagger-ui';
-// import jwt from '@fastify/jwt';
+import jwt from '@fastify/jwt';
 import serveStatic from '@fastify/static';
 import ajvKeywords from 'ajv-keywords';
-import { APIError } from 'maru/errors.js'; // eslint-disable-line import/no-unresolved
+import APIError from 'maru/APIError.js';
 
-import wsRestApi from './lib/socket.io/restApi.js';
+// import wsRestApi from './lib/socket.io/restApi.js';
 import APIErrorSchema from './lib/schemas/APIError.js';
 import ObjectIdSchema from './lib/schemas/ObjectId.js';
 import HttpStatus from './lib/HttpStatus.js';
@@ -62,22 +62,13 @@ export default class Server {
 
     this.server.setErrorHandler((error, request, reply) => {
       if (error instanceof APIError) {
-        return reply
-          .status(error.status)
-          .send({
-            code: error.code,
-            message: error.message
-          });
+        return reply.status(error.status ?? 500).send(error);
       }
 
       const status = error.statusCode ?? reply.statusCode ?? 500;
-
-      return reply
-        .status(status)
-        .send({
-          code: error.validation ? 'VALIDATION_FAILED' : (HttpStatus[status] ?? 'UNKNOWN_ERROR'),
-          message: error.message
-        });
+      const code = error.validation ? 'VALIDATION_FAILED' : (HttpStatus[status] ?? 'UNKNOWN_ERROR');
+      const detail = error.message;
+      return reply.status(status).send({ code, detail });
     });
 
     this.server.setNotFoundHandler((request, reply) => {
@@ -116,12 +107,18 @@ export default class Server {
     });
     await this.server.register(swaggerUI, { routePrefix: '/docs' });
 
-    // TODO: Непонятно как это совместить с socket.io
-    // if (this.config.auth) {
-    //   await this.server.register(jwt, { secret: this.config.auth.secret });
-    // }
+    // TODO: Пока непонятно как это совместить с socket.io
+    if (this.config.auth) {
+      await this.server.register(jwt, { secret: this.config.auth.secret });
 
-    await this.server.register(wsRestApi(this.app));
+      this.server.addHook('onRequest', async (req) => {
+        if (req.headers.authorization) {
+          await req.jwtVerify();
+        }
+      });
+    }
+
+    // await this.server.register(wsRestApi(this.app));
 
     this.server.addSchema(APIErrorSchema);
     this.server.addSchema(ObjectIdSchema);
@@ -141,7 +138,7 @@ export default class Server {
     for (const files of Object.values(this.app.modules)) {
       if (files.router) {
         const router = (await import(files.router)).default;
-        const wrapper = async (server, opts, done) => {
+        const wrapper = async (server) => {
           if (files.schemas) {
             const schemas = await Promise.all(
               Object.values(files.schemas).map(async (url) => (await import(url)).default)
@@ -149,7 +146,6 @@ export default class Server {
             schemas.forEach((schema) => server.addSchema(schema));
           }
           router(this.app, server);
-          done();
         };
         await this.server.register(wrapper);
       }
@@ -167,8 +163,8 @@ export default class Server {
 
   async stop() {
     // Закрываем вручную все соединения, иначе server.close намертво зависает
-    this.server.io.disconnectSockets(true);
+    this.server.io?.disconnectSockets(true);
     await this.server.close();
-    this.server.io.close();
+    this.server.io?.close();
   }
 }

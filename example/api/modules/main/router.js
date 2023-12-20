@@ -1,3 +1,5 @@
+import { Forbidden } from '../../../../lib/errors.js'; // eslint-disable-line import/no-unresolved
+
 export default (app, server) => {
   server.get('/book/:id', {
     schema: {
@@ -8,11 +10,15 @@ export default (app, server) => {
         200: { $ref: 'Book#' }
       }
     }
+  }, async () => ({ id: 1, title: 'Pride and prejudice', author: 'Jane Austen' }));
+
+  server.get('/secretSection', {
+    schema: {
+      response: {
+        403: { $ref: 'APIError#' }
+      }
+    }
   }, async () => {
-    return {
-      id: 1,
-      title: 'Pride and prejudice',
-      author: 'Jane Austen'
-    };
+    throw new Forbidden();
   });
 };
