@@ -12,7 +12,8 @@
   "type": "module",
   "exports": {
     ".": "./index.js",
-    "./errors.js": "./lib/errors.js"
+    "./errors.js": "./lib/errors.js",
+    "./onlyUsers.js": "./lib/policies/onlyUsers.js"
   },
   "scripts": {
     "test": "node --test"

@@ -1,4 +1,5 @@
 import { Forbidden } from '../../../../lib/errors.js'; // eslint-disable-line import/no-unresolved
+import onlyUsers from '../../../../lib/policies/onlyUsers.js';
 
 export default (app, server) => {
   server.get('/book/:id', {
@@ -12,13 +13,12 @@ export default (app, server) => {
     }
   }, async () => ({ id: 1, title: 'Pride and prejudice', author: 'Jane Austen' }));
 
-  server.get('/secretSection', {
+  server.get('/privateSection', {
     schema: {
       response: {
-        403: { $ref: 'APIError#' }
+        200: { type: 'string' }
       }
-    }
-  }, async () => {
-    throw new Forbidden();
-  });
+    },
+    preHandler: onlyUsers
+  }, async () => 'Some private data');
 };

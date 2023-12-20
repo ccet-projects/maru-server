@@ -13,7 +13,6 @@ import APIError from 'maru/APIError.js';
 
 // import wsRestApi from './lib/socket.io/restApi.js';
 import APIErrorSchema from './lib/schemas/APIError.js';
-import ObjectIdSchema from './lib/schemas/ObjectId.js';
 import HttpStatus from './lib/HttpStatus.js';
 
 export default class Server {
@@ -62,7 +61,7 @@ export default class Server {
 
     this.server.setErrorHandler((error, request, reply) => {
       if (error instanceof APIError) {
-        return reply.status(error.status ?? 500).send(error);
+        return reply.status(error.status ?? 500).send(error.toJSON());
       }
 
       const status = error.statusCode ?? reply.statusCode ?? 500;
@@ -121,7 +120,6 @@ export default class Server {
     // await this.server.register(wsRestApi(this.app));
 
     this.server.addSchema(APIErrorSchema);
-    this.server.addSchema(ObjectIdSchema);
 
     this.server.get('/', {
       schema: {

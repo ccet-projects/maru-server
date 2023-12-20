@@ -36,9 +36,9 @@ describe('REST API', () => {
   });
 
   it('Иные HTTP-статусы', async () => {
-    const url = `${app.config.baseUrl}/secretSection`;
+    const url = `${app.config.baseUrl}/privateSection`;
     const response = await fetch(url);
-    assert.equal(response.status, 403);
+    assert.equal(response.status, 401);
     const error = await response.json();
     assert.ok(error.code);
   });
